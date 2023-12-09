@@ -115,7 +115,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
-        Request request = new Request(queryParameters, requestBody);
+        Request request = Request.builder().queryParameters(queryParameters).body(requestBody).build();
 
         final String expectedOutput = """
                 {
@@ -142,7 +142,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
-        Request request = new Request(queryParameters, requestBody);
+        Request request = Request.builder().queryParameters(queryParameters).body(requestBody).build();
 
         final String expectedOutput = """
                 {
@@ -155,6 +155,28 @@ public class MapperTest {
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam1");
         FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam2");
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenPathVariableFieldMappings_shouldMapSuccessfully() throws JSONException {
+        final Map<String, String> pathVariables = Map.of("pathVariable1", "pathVariable1Value", "pathVariable2", "pathVariable2Value");
+        Request request = Request.builder().pathVariables(pathVariables).build();
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "pathVariable1Value",
+                    "newField2" : "pathVariable2Value"
+                }
+                """;
+
+        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.PATH_VARIABLE, "pathVariable1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.PATH_VARIABLE, "pathVariable2");
+        ob.addFieldMappings(fieldMapping1, fieldMapping2);
 
         String output = ob.buildJson(request);
 
