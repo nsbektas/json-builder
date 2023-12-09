@@ -17,9 +17,10 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
+        Request request = new Request(null, null, requestBody);
         final String expectedOutput = "";
         ObjectBuilder ob = new ObjectBuilder("serviceName");
-        String output = ob.buildJson(Request.builder().body(requestBody).build());
+        String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
@@ -31,6 +32,7 @@ public class MapperTest {
                     "field1" : "value1"
                 }
                 """;
+        Request request = new Request(null, null, requestBody);
 
         final String expectedOutput = """
                 {
@@ -43,7 +45,7 @@ public class MapperTest {
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping);
 
-        String output = ob.buildJson(Request.builder().body(requestBody).build());
+        String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
@@ -57,6 +59,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
+        Request request = new Request(null, null, requestBody);
 
         final String expectedOutput = """
                 {
@@ -71,7 +74,7 @@ public class MapperTest {
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
 
-        String output = ob.buildJson(Request.builder().body(requestBody).build());
+        String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
@@ -85,6 +88,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
+        Request request = new Request(null, null, requestBody);
 
         final String expectedOutput = """
                 {
@@ -99,7 +103,7 @@ public class MapperTest {
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
 
-        String output = ob.buildJson(Request.builder().body(requestBody).build());
+        String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
@@ -115,7 +119,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
-        Request request = Request.builder().queryParameters(queryParameters).body(requestBody).build();
+        Request request = new Request(null, queryParameters, requestBody);
 
         final String expectedOutput = """
                 {
@@ -142,7 +146,7 @@ public class MapperTest {
                     "field3" : "value3"
                 }
                 """;
-        Request request = Request.builder().queryParameters(queryParameters).body(requestBody).build();
+        Request request = new Request(null, queryParameters, requestBody);
 
         final String expectedOutput = """
                 {
@@ -164,7 +168,7 @@ public class MapperTest {
     @Test
     void givenPathVariableFieldMappings_shouldMapSuccessfully() throws JSONException {
         final Map<String, String> pathVariables = Map.of("pathVariable1", "pathVariable1Value", "pathVariable2", "pathVariable2Value");
-        Request request = Request.builder().pathVariables(pathVariables).build();
+        Request request = new Request(pathVariables, null, null);
 
         final String expectedOutput = """
                 {

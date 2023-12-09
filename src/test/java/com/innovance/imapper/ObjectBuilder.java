@@ -32,12 +32,11 @@ public class ObjectBuilder {
         for (FieldMapping fieldMapping : fieldMappings) {
             Object value = null;
             if (ValueSourceType.PATH_VARIABLE.equals(fieldMapping.getValueSourceType())) {
-                value = request.getPathVariables().get(fieldMapping.getValueFieldName());
+                value = request.getValueFromPathVariables(fieldMapping.getValueFieldName());
             } else if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
-                value = request.getQueryParameters().get(fieldMapping.getValueFieldName());
+                value = request.getValueFromQueryParameters(fieldMapping.getValueFieldName());
             } else if (ValueSourceType.REQUEST_BODY.equals(fieldMapping.getValueSourceType())) {
-                JSONObject requestBodyJsonObject = new JSONObject(request.getBody());
-                value = requestBodyJsonObject.has(fieldMapping.getValueFieldName()) ? requestBodyJsonObject.get(fieldMapping.getValueFieldName()) : null;
+                value = request.getValueFromRequestBody(fieldMapping.getValueFieldName());
             }
 
             // Default behaviour is INCLUDE.NON_NULL
