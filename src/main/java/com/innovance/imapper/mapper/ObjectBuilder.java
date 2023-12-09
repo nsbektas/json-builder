@@ -12,16 +12,13 @@ import java.util.List;
 
 public class ObjectBuilder {
 
-    private String serviceName;
     private List<FieldMapping> fieldMappings;
 
-    public ObjectBuilder(String serviceName) {
-        this.serviceName = serviceName;
+    public ObjectBuilder() {
         this.fieldMappings = new ArrayList<>();
     }
 
-    public ObjectBuilder(String serviceName, List<FieldMapping> fieldMappings) {
-        this.serviceName = serviceName;
+    public ObjectBuilder(List<FieldMapping> fieldMappings) {
         this.fieldMappings = fieldMappings != null ? fieldMappings : new ArrayList<>();
     }
 

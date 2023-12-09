@@ -14,7 +14,7 @@ public class MapperController {
     @PostMapping("build-request")
     public ResponseEntity<String> buildRequest(@RequestBody RequestDto requestDto) {
         Request request = new Request(requestDto.getPathVariables(), requestDto.getQueryParameters(), requestDto.getBody());
-        ObjectBuilder objectBuilder = new ObjectBuilder("dummyServiceName", requestDto.getFieldMappings());
+        ObjectBuilder objectBuilder = new ObjectBuilder(requestDto.getFieldMappings());
         String output = objectBuilder.buildJson(request);
 
         return ResponseEntity.ok(output);

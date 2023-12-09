@@ -23,7 +23,7 @@ public class MapperTest {
                 """;
         Request request = new Request(null, null, requestBody);
         final String expectedOutput = "";
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
@@ -46,7 +46,7 @@ public class MapperTest {
 
         FieldMapping fieldMapping = createFieldMapping("newField", ValueSourceType.REQUEST_BODY, "field1");
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping);
 
         String output = ob.buildJson(request);
@@ -75,7 +75,7 @@ public class MapperTest {
         FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "field1");
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "field2");
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
 
         String output = ob.buildJson(request);
@@ -104,7 +104,7 @@ public class MapperTest {
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "notAvailableField");
         FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "notAvailableField2");
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
 
         String output = ob.buildJson(request);
@@ -131,7 +131,7 @@ public class MapperTest {
                 }
                 """;
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         FieldMapping fieldMapping = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
         ob.addFieldMappings(fieldMapping);
 
@@ -158,7 +158,7 @@ public class MapperTest {
                 }
                 """;
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam1");
         FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam2");
@@ -181,7 +181,7 @@ public class MapperTest {
                 }
                 """;
 
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ObjectBuilder ob = new ObjectBuilder();
         FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.PATH_VARIABLE, "pathVariable1");
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.PATH_VARIABLE, "pathVariable2");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
