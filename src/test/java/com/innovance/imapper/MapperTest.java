@@ -1,5 +1,9 @@
 package com.innovance.imapper;
 
+import com.innovance.imapper.mapper.FieldMapping;
+import com.innovance.imapper.mapper.ObjectBuilder;
+import com.innovance.imapper.mapper.Request;
+import com.innovance.imapper.mapper.ValueSourceType;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;

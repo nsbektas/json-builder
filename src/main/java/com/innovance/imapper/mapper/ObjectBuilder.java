@@ -1,4 +1,4 @@
-package com.innovance.imapper;
+package com.innovance.imapper.mapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +14,12 @@ public class ObjectBuilder {
 
     public ObjectBuilder(String serviceName) {
         this.serviceName = serviceName;
+        this.fieldMappings = new ArrayList<>();
+    }
+
+    public ObjectBuilder(String serviceName, List<FieldMapping> fieldMappings) {
+        this.serviceName = serviceName;
+        this.fieldMappings = fieldMappings != null ? fieldMappings : new ArrayList<>();
     }
 
     public void addFieldMappings(FieldMapping... fieldMappings) {

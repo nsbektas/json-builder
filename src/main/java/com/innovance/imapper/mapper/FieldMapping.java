@@ -1,4 +1,4 @@
-package com.innovance.imapper;
+package com.innovance.imapper.mapper;
 
 import lombok.*;
 
