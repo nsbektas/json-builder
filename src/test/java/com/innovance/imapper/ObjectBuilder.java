@@ -9,25 +9,25 @@ import java.util.List;
 public class ObjectBuilder {
 
     private String serviceName;
-    private List<Field> fields;
+    private List<FieldMapping> fieldMappings;
 
     public ObjectBuilder(String serviceName) {
         this.serviceName = serviceName;
     }
 
-    public void addFields(Field... fields) {
-        if (this.fields == null) {
-            this.fields = new ArrayList<>();
+    public void addFieldMappings(FieldMapping... fieldMappings) {
+        if (this.fieldMappings == null) {
+            this.fieldMappings = new ArrayList<>();
         }
-        this.fields.addAll(List.of(fields));
+        this.fieldMappings.addAll(List.of(fieldMappings));
     }
 
     public String buildJson(String requestBody) throws JSONException {
         JSONObject requestBodyJsonObject = new JSONObject(requestBody);
         JSONObject output = new JSONObject();
-        for (Field field : fields) {
-            Object value = requestBodyJsonObject.get(field.getValueName());
-            output.put(field.getName(), value);
+        for (FieldMapping fieldMapping : fieldMappings) {
+            Object value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
+            output.put(fieldMapping.getName(), value);
         }
         return output.toString();
     }

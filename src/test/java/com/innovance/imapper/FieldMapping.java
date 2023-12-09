@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Field {
+public class FieldMapping {
 
     private long id;
     private String name;
-    private String valueName;
+    private String valueFieldName;
 }
