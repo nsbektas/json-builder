@@ -15,11 +15,11 @@ public class ObjectBuilder {
         this.serviceName = serviceName;
     }
 
-    public void addFields(Field field) {
-        if (fields == null) {
-            fields = new ArrayList<>();
+    public void addFields(Field... fields) {
+        if (this.fields == null) {
+            this.fields = new ArrayList<>();
         }
-        fields.add(field);
+        this.fields.addAll(List.of(fields));
     }
 
     public String buildJson(String requestBody) throws JSONException {
