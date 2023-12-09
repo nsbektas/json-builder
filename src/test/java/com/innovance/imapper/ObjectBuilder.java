@@ -35,9 +35,17 @@ public class ObjectBuilder {
             if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
                 value = request.getQueryParameters().get(fieldMapping.getValueFieldName());
             } else {
-                value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
+                if (requestBodyJsonObject.has(fieldMapping.getValueFieldName())) {
+                    value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
+                } else {
+                    value = null;
+                }
             }
-            output.put(fieldMapping.getName(), value);
+
+            // Default behaviour is INCLUDE.NON_NULL
+            if (value != null) {
+                output.put(fieldMapping.getName(), value);
+            }
         }
         return output.toString();
     }

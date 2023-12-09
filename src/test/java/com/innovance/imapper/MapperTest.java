@@ -77,6 +77,35 @@ public class MapperTest {
     }
 
     @Test
+    void givenBasicFieldMappings_whenSomeMappingValuesNotFound_shouldMapSuccessfully() throws JSONException {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "field3" : "value3"
+                }
+                """;
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "value1"
+                }
+                """;
+
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", "notAvailableField");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", "notAvailableField2");
+
+        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
+
+        String output = ob.buildJson(Request.builder().body(requestBody).build());
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+
+    @Test
     void givenOneQueryParamFieldMapping_shouldMapSuccessfully() throws JSONException {
         final Map<String, String> queryParameters = Map.of("queryParam1", "queryParam1Value");
         final String requestBody = """
