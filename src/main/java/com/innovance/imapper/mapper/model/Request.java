@@ -1,4 +1,4 @@
-package com.innovance.imapper.mapper;
+package com.innovance.imapper.mapper.model;
 
 import lombok.Getter;
 import lombok.Setter;

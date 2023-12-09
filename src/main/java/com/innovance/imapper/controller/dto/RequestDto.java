@@ -1,6 +1,6 @@
 package com.innovance.imapper.controller.dto;
 
-import com.innovance.imapper.mapper.FieldMapping;
+import com.innovance.imapper.mapper.model.FieldMapping;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 

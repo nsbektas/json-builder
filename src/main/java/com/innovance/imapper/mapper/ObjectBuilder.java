@@ -1,5 +1,8 @@
 package com.innovance.imapper.mapper;
 
+import com.innovance.imapper.mapper.model.FieldMapping;
+import com.innovance.imapper.mapper.model.Request;
+import com.innovance.imapper.mapper.model.ValueSourceType;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.util.CollectionUtils;
