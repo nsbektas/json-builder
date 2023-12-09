@@ -7,7 +7,23 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class MapperTest {
 
     @Test
-    void shouldMapSingleBasicField() throws JSONException {
+    void givenNoFieldMapping_shouldMapToEmptyString() throws JSONException {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "field3" : "value3"
+                }
+                """;
+        final String expectedOutput = "";
+        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        String output = ob.buildJson(requestBody);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenOneBasicFieldMapping_shouldMapSuccessfully() throws JSONException {
         final String requestBody = """
                 {
                     "field1" : "value1"
@@ -31,7 +47,7 @@ public class MapperTest {
     }
 
     @Test
-    void shouldMapTwoBasicFieldsFromRequestBody() throws JSONException {
+    void givenTwoBasicFieldMappings_shouldMapSuccessfully() throws JSONException {
         final String requestBody = """
                 {
                     "field1" : "value1",
@@ -53,22 +69,6 @@ public class MapperTest {
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
 
-        String output = ob.buildJson(requestBody);
-
-        JSONAssert.assertEquals(expectedOutput, output, true);
-    }
-
-    @Test
-    void mapToEmptyString_whenNoFieldMappingExists() throws JSONException {
-        final String requestBody = """
-                {
-                    "field1" : "value1",
-                    "field2" : "value2",
-                    "field3" : "value3"
-                }
-                """;
-        final String expectedOutput = "";
-        ObjectBuilder ob = new ObjectBuilder("serviceName");
         String output = ob.buildJson(requestBody);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
