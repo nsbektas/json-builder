@@ -23,15 +23,20 @@ public class ObjectBuilder {
         this.fieldMappings.addAll(List.of(fieldMappings));
     }
 
-    public String buildJson(String requestBody) throws JSONException {
+    public String buildJson(Request request) throws JSONException {
         if (CollectionUtils.isEmpty(fieldMappings)) {
             return "";
         }
-        
-        JSONObject requestBodyJsonObject = new JSONObject(requestBody);
+
+        JSONObject requestBodyJsonObject = new JSONObject(request.getBody());
         JSONObject output = new JSONObject();
         for (FieldMapping fieldMapping : fieldMappings) {
-            Object value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
+            Object value;
+            if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
+                value = request.getQueryParameters().get(fieldMapping.getValueFieldName());
+            } else {
+                value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
+            }
             output.put(fieldMapping.getName(), value);
         }
         return output.toString();
