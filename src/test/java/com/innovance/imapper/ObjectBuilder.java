@@ -2,6 +2,7 @@ package com.innovance.imapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,10 @@ public class ObjectBuilder {
     }
 
     public String buildJson(String requestBody) throws JSONException {
+        if (CollectionUtils.isEmpty(fieldMappings)) {
+            return "";
+        }
+        
         JSONObject requestBodyJsonObject = new JSONObject(requestBody);
         JSONObject output = new JSONObject();
         for (FieldMapping fieldMapping : fieldMappings) {

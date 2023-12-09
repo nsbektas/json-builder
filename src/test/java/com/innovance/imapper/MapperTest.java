@@ -58,6 +58,22 @@ public class MapperTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void mapToEmptyString_whenNoFieldMappingExists() throws JSONException {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "field3" : "value3"
+                }
+                """;
+        final String expectedOutput = "";
+        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        String output = ob.buildJson(requestBody);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
     private FieldMapping createFieldMapping(String name, String valueFieldName) {
         FieldMapping fieldMapping = new FieldMapping();
         fieldMapping.setName(name);
