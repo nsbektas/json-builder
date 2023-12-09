@@ -38,7 +38,7 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping = createFieldMapping("newField", "field1");
+        FieldMapping fieldMapping = createFieldMapping("newField", ValueSourceType.REQUEST_BODY, "field1");
 
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping);
@@ -65,8 +65,8 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", "field2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "field2");
 
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
@@ -77,7 +77,7 @@ public class MapperTest {
     }
 
     @Test
-    void givenBasicFieldMappings_whenSomeMappingValuesNotFound_shouldMapSuccessfully() throws JSONException {
+    void givenBasicFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyNotNullValues() throws JSONException {
         final String requestBody = """
                 {
                     "field1" : "value1",
@@ -92,9 +92,9 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", "notAvailableField");
-        FieldMapping fieldMapping3 = createFieldMapping("newField3", "notAvailableField2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "notAvailableField");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "notAvailableField2");
 
         ObjectBuilder ob = new ObjectBuilder("serviceName");
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
@@ -124,11 +124,7 @@ public class MapperTest {
                 """;
 
         ObjectBuilder ob = new ObjectBuilder("serviceName");
-        FieldMapping fieldMapping = new FieldMapping();
-        fieldMapping.setName("newField1");
-        fieldMapping.setValueFieldName("queryParam1");
-        fieldMapping.setValueSourceType(ValueSourceType.QUERY_PARAMETER);
-
+        FieldMapping fieldMapping = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
         ob.addFieldMappings(fieldMapping);
 
         String output = ob.buildJson(request);
@@ -136,10 +132,40 @@ public class MapperTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
-    private FieldMapping createFieldMapping(String name, String valueFieldName) {
-        FieldMapping fieldMapping = new FieldMapping();
-        fieldMapping.setName(name);
-        fieldMapping.setValueFieldName(valueFieldName);
-        return fieldMapping;
+    @Test
+    void givenQueryParamFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyNotNullValues() throws JSONException {
+        final Map<String, String> queryParameters = Map.of("queryParam1", "queryParam1Value");
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "field3" : "value3"
+                }
+                """;
+        Request request = new Request(queryParameters, requestBody);
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "queryParam1Value"
+                }
+                """;
+
+        ObjectBuilder ob = new ObjectBuilder("serviceName");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam1");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam2");
+        ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    private FieldMapping createFieldMapping(String name, ValueSourceType valueSourceType, String valueFieldName) {
+        return FieldMapping.builder()
+                .name(name)
+                .valueSourceType(valueSourceType)
+                .valueFieldName(valueFieldName)
+                .build();
     }
 }

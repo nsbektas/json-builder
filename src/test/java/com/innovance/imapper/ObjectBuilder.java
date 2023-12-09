@@ -31,18 +31,15 @@ public class ObjectBuilder {
         JSONObject requestBodyJsonObject = new JSONObject(request.getBody());
         JSONObject output = new JSONObject();
         for (FieldMapping fieldMapping : fieldMappings) {
-            Object value;
+            Object value = null;
             if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
                 value = request.getQueryParameters().get(fieldMapping.getValueFieldName());
-            } else {
-                if (requestBodyJsonObject.has(fieldMapping.getValueFieldName())) {
-                    value = requestBodyJsonObject.get(fieldMapping.getValueFieldName());
-                } else {
-                    value = null;
-                }
+            } else if (ValueSourceType.REQUEST_BODY.equals(fieldMapping.getValueSourceType())) {
+                value = requestBodyJsonObject.has(fieldMapping.getValueFieldName()) ? requestBodyJsonObject.get(fieldMapping.getValueFieldName()) : null;
             }
 
             // Default behaviour is INCLUDE.NON_NULL
+            // TODO do we need to add empty string?
             if (value != null) {
                 output.put(fieldMapping.getName(), value);
             }
