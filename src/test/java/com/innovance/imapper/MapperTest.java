@@ -10,6 +10,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Map;
 
+import static com.innovance.imapper.mapper.model.Request.SUBFIELD_SEPARATOR;
+
 public class MapperTest {
 
     @Test
@@ -185,6 +187,39 @@ public class MapperTest {
         FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.PATH_VARIABLE, "pathVariable1");
         FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.PATH_VARIABLE, "pathVariable2");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenBasicSubfieldMapping_shouldMapSuccessfully() {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "customObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    }
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "subObjectValue1",
+                    "newField2" : "subObjectValue2"
+                }
+                """;
+
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field2");
+
+        ObjectBuilder ob = new ObjectBuilder();
+        ob.addFieldMappings(fieldMapping1);
+        ob.addFieldMappings(fieldMapping2);
 
         String output = ob.buildJson(request);
 

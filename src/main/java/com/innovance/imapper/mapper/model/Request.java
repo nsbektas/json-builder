@@ -11,6 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class Request {
+    public static final String SUBFIELD_SEPARATOR = "->";
     private final Map<String, String> pathVariables;
     private final Map<String, String> queryParameters;
     private final String body;
@@ -37,7 +38,18 @@ public class Request {
         return queryParameters.get(fieldName);
     }
 
-    public Object getValueFromRequestBody(String fieldName) throws JSONException {
-        return bodyJsonObject.has(fieldName) ? bodyJsonObject.get(fieldName) : null;
+    public Object getValueFromRequestBody(String fieldSelector) throws JSONException {
+        String[] orderedSelectors = fieldSelector.split(SUBFIELD_SEPARATOR);
+
+        if (orderedSelectors.length == 1) {
+            return bodyJsonObject.has(orderedSelectors[0]) ? bodyJsonObject.get(orderedSelectors[0]) : null;
+        }
+
+        JSONObject subObject = bodyJsonObject;
+        for (int i = 0; i < orderedSelectors.length - 1; i++) {
+            subObject = subObject.getJSONObject(orderedSelectors[i]);
+        }
+
+        return subObject.get(orderedSelectors[orderedSelectors.length - 1]);
     }
 }
