@@ -349,6 +349,39 @@ public class MapperTest {
 
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
+    
+    @Test
+    void givenBasicMappingForObjectType_shouldMapSuccessfully() {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "customObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    }
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
+
+        final String expectedOutput = """
+                {
+                    "newCustomObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    }
+                }
+                """;
+
+        FieldMapping fieldMapping = createFieldMapping("newCustomObj", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj");
+
+        ObjectBuilder ob = new ObjectBuilder();
+        ob.addFieldMappings(fieldMapping);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
 
 
     private FieldMapping createFieldMapping(String name, FieldType fieldType, ValueSourceType valueSourceType, String valueFieldName) {
