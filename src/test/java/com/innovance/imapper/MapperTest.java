@@ -86,7 +86,7 @@ public class MapperTest {
     }
 
     @Test
-    void givenBasicFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyNotNullValues() throws JSONException {
+    void givenBasicFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyMatchedValues() throws JSONException {
         final String requestBody = """
                 {
                     "field1" : "value1",
@@ -143,7 +143,7 @@ public class MapperTest {
     }
 
     @Test
-    void givenQueryParamFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyNotNullValues() throws JSONException {
+    void givenQueryParamFieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyMatchedValues() throws JSONException {
         final Map<String, String> queryParameters = Map.of("queryParam1", "queryParam1Value");
         final String requestBody = """
                 {
