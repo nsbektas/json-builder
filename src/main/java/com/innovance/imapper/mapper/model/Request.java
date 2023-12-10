@@ -48,7 +48,12 @@ public class Request {
         JSONObject subObject = bodyJsonObject;
         for (int i = 0; i < orderedSelectors.length - 1; i++) {
             if (subObject.has(orderedSelectors[i])) {
-                subObject = subObject.getJSONObject(orderedSelectors[i]);
+                Object obj = subObject.get(orderedSelectors[i]);
+                if (obj instanceof JSONObject) {
+                    subObject = (JSONObject) obj;
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }

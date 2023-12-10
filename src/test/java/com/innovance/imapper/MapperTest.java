@@ -260,6 +260,53 @@ public class MapperTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenSubfieldMappings_whenSomeMappingsNotCorrectType_shouldMapOnylMathedValues() {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "customObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    },
+                    "customList" : [
+                        "str1", "str2", "str3"
+                    ],
+                    "customObjList" : [
+                        { "field1" : "listItem1Value1", "field2" : "listItem1Value2"},
+                        { "field1" : "listItem2Value1", "field2" : "listItem2Value2"},
+                        { "field1" : "listItem3Value1", "field2" : "listItem3Value2"}
+                    ]
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "subObjectValue1"
+                }
+                """;
+
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "field1" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field3");
+        FieldMapping fieldMapping4 = createFieldMapping("newField4", ValueSourceType.REQUEST_BODY, "customList" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping5 = createFieldMapping("newField4", ValueSourceType.REQUEST_BODY, "customObjList" + SUBFIELD_SEPARATOR + "field1");
+
+        ObjectBuilder ob = new ObjectBuilder();
+        ob.addFieldMappings(fieldMapping1);
+        ob.addFieldMappings(fieldMapping2);
+        ob.addFieldMappings(fieldMapping3);
+        ob.addFieldMappings(fieldMapping4);
+        ob.addFieldMappings(fieldMapping5);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+
     private FieldMapping createFieldMapping(String name, ValueSourceType valueSourceType, String valueFieldName) {
         return FieldMapping.builder()
                 .name(name)
