@@ -1,0 +1,6 @@
+    /* TODO
+    - SubField ayrımı için bir seperator değeri belirlememiz lazım.
+    - Value aynen alıyoruz, herhangi bir conversion gerekecek mi? (Date format vb.)
+    - İki field'ın birleşimi gibi ihtiyaçlar olacak mı?
+    - FieldMapping oneToMany yapabiliriz.
+     */
