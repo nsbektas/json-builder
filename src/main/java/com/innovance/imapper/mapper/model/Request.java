@@ -40,26 +40,28 @@ public class Request {
 
     public Object getValueFromRequestBody(String fieldSelector) throws JSONException {
         String[] orderedSelectors = fieldSelector.split(SUBFIELD_SEPARATOR);
+        return getValueOrNull(bodyJsonObject, orderedSelectors);
+    }
 
-        if (orderedSelectors.length == 1) {
-            return bodyJsonObject.has(orderedSelectors[0]) ? bodyJsonObject.get(orderedSelectors[0]) : null;
-        }
-
-        JSONObject subObject = bodyJsonObject;
-        for (int i = 0; i < orderedSelectors.length - 1; i++) {
-            if (subObject.has(orderedSelectors[i])) {
-                Object obj = subObject.get(orderedSelectors[i]);
-                if (obj instanceof JSONObject) {
-                    subObject = (JSONObject) obj;
-                } else {
-                    return null;
-                }
-            } else {
+    //TODO Maybe move this helper methods into something like JsonHelper etc.
+    private Object getValueOrNull(JSONObject obj, String[] selectors) {
+        JSONObject subObject = obj;
+        for (int i = 0; i < selectors.length - 1; i++) {
+            subObject = getJsonObjectOrNull(subObject, selectors[i]);
+            if (subObject == null) {
                 return null;
             }
         }
 
-        return subObject.has(orderedSelectors[orderedSelectors.length - 1]) ?
-                subObject.get(orderedSelectors[orderedSelectors.length - 1]) : null;
+        return getJsonValueOrNull(subObject, selectors[selectors.length - 1]);
+    }
+
+    private Object getJsonValueOrNull(JSONObject obj, String key) {
+        return obj.has(key) ? obj.get(key) : null;
+    }
+
+    private JSONObject getJsonObjectOrNull(JSONObject obj, String key) {
+        Object maybeJsonObj = getJsonValueOrNull(obj, key);
+        return maybeJsonObj instanceof JSONObject jsonObj ? jsonObj : null;
     }
 }
