@@ -2,12 +2,14 @@ package com.innovance.imapper;
 
 import com.innovance.imapper.mapper.ObjectBuilder;
 import com.innovance.imapper.mapper.model.FieldMapping;
+import com.innovance.imapper.mapper.model.FieldType;
 import com.innovance.imapper.mapper.model.Request;
 import com.innovance.imapper.mapper.model.ValueSourceType;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.innovance.imapper.mapper.model.Request.SUBFIELD_SEPARATOR;
@@ -46,7 +48,7 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping = createFieldMapping("newField", ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping fieldMapping = createFieldMapping("newField", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field1");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping);
@@ -74,8 +76,8 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "field2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field2");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
@@ -102,9 +104,9 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "notAvailableField");
-        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "notAvailableField2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "notAvailableField");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "notAvailableField2");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
@@ -134,7 +136,7 @@ public class MapperTest {
                 """;
 
         ObjectBuilder ob = new ObjectBuilder();
-        FieldMapping fieldMapping = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
+        FieldMapping fieldMapping = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.QUERY_PARAMETER, "queryParam1");
         ob.addFieldMappings(fieldMapping);
 
         String output = ob.buildJson(request);
@@ -161,9 +163,9 @@ public class MapperTest {
                 """;
 
         ObjectBuilder ob = new ObjectBuilder();
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.QUERY_PARAMETER, "queryParam1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam1");
-        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.QUERY_PARAMETER, "queryParam1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam1");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", FieldType.BASIC, ValueSourceType.QUERY_PARAMETER, "notAvailableQueryParam2");
         ob.addFieldMappings(fieldMapping1, fieldMapping2, fieldMapping3);
 
         String output = ob.buildJson(request);
@@ -184,8 +186,8 @@ public class MapperTest {
                 """;
 
         ObjectBuilder ob = new ObjectBuilder();
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.PATH_VARIABLE, "pathVariable1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.PATH_VARIABLE, "pathVariable2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.PATH_VARIABLE, "pathVariable1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.PATH_VARIABLE, "pathVariable2");
         ob.addFieldMappings(fieldMapping1, fieldMapping2);
 
         String output = ob.buildJson(request);
@@ -214,8 +216,8 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field2");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1);
@@ -246,9 +248,9 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field3");
-        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field2");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field3");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field2");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1);
@@ -288,11 +290,11 @@ public class MapperTest {
                 }
                 """;
 
-        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
-        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "field1" + SUBFIELD_SEPARATOR + "field1");
-        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field3");
-        FieldMapping fieldMapping4 = createFieldMapping("newField4", ValueSourceType.REQUEST_BODY, "customList" + SUBFIELD_SEPARATOR + "field1");
-        FieldMapping fieldMapping5 = createFieldMapping("newField4", ValueSourceType.REQUEST_BODY, "customObjList" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field1" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field3");
+        FieldMapping fieldMapping4 = createFieldMapping("newField4", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customList" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping5 = createFieldMapping("newField4", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObjList" + SUBFIELD_SEPARATOR + "field1");
 
         ObjectBuilder ob = new ObjectBuilder();
         ob.addFieldMappings(fieldMapping1);
@@ -306,10 +308,53 @@ public class MapperTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenSubObjectMapping_shouldMapSuccessfully() {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "customObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    }
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
 
-    private FieldMapping createFieldMapping(String name, ValueSourceType valueSourceType, String valueFieldName) {
+        final String expectedOutput = """
+                {
+                    "subObject" : {
+                        "field1" : "value1",
+                        "field2" : "value2",
+                        "field3" : "subObjectValue1",
+                        "field4" : "subObjectValue2"
+                    }
+                }
+                """;
+
+        FieldMapping fieldMapping = createFieldMapping("subObject", FieldType.OBJECT, null, null);
+
+        FieldMapping subfieldMapping1 = createFieldMapping("field1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field1");
+        FieldMapping subfieldMapping2 = createFieldMapping("field2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "field2");
+        FieldMapping subfieldMapping3 = createFieldMapping("field3", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping subfieldMapping4 = createFieldMapping("field4", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field2");
+
+        fieldMapping.setSubfieldMappings(List.of(subfieldMapping1, subfieldMapping2, subfieldMapping3, subfieldMapping4));
+
+        ObjectBuilder ob = new ObjectBuilder();
+        ob.addFieldMappings(fieldMapping);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+
+    private FieldMapping createFieldMapping(String name, FieldType fieldType, ValueSourceType valueSourceType, String valueFieldName) {
         return FieldMapping.builder()
                 .name(name)
+                .fieldType(fieldType)
                 .valueSourceType(valueSourceType)
                 .valueFieldName(valueFieldName)
                 .build();

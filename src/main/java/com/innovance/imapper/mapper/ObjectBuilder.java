@@ -1,6 +1,7 @@
 package com.innovance.imapper.mapper;
 
 import com.innovance.imapper.mapper.model.FieldMapping;
+import com.innovance.imapper.mapper.model.FieldType;
 import com.innovance.imapper.mapper.model.Request;
 import com.innovance.imapper.mapper.model.ValueSourceType;
 import org.json.JSONException;
@@ -37,12 +38,17 @@ public class ObjectBuilder {
         JSONObject output = new JSONObject();
         for (FieldMapping fieldMapping : fieldMappings) {
             Object value = null;
-            if (ValueSourceType.PATH_VARIABLE.equals(fieldMapping.getValueSourceType())) {
-                value = request.getValueFromPathVariables(fieldMapping.getValueFieldName());
-            } else if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
-                value = request.getValueFromQueryParameters(fieldMapping.getValueFieldName());
-            } else if (ValueSourceType.REQUEST_BODY.equals(fieldMapping.getValueSourceType())) {
-                value = request.getValueFromRequestBody(fieldMapping.getValueFieldName());
+            if (FieldType.BASIC.equals(fieldMapping.getFieldType())) {
+                if (ValueSourceType.PATH_VARIABLE.equals(fieldMapping.getValueSourceType())) {
+                    value = request.getValueFromPathVariables(fieldMapping.getValueFieldName());
+                } else if (ValueSourceType.QUERY_PARAMETER.equals(fieldMapping.getValueSourceType())) {
+                    value = request.getValueFromQueryParameters(fieldMapping.getValueFieldName());
+                } else if (ValueSourceType.REQUEST_BODY.equals(fieldMapping.getValueSourceType())) {
+                    value = request.getValueFromRequestBody(fieldMapping.getValueFieldName());
+                }
+            } else if (FieldType.OBJECT.equals(fieldMapping.getFieldType())) {
+                ObjectBuilder subObjectBuilder = new ObjectBuilder(fieldMapping.getSubfieldMappings());
+                value = new JSONObject(subObjectBuilder.buildJson(request));
             }
 
             // Default behaviour is INCLUDE.NON_NULL
@@ -51,6 +57,7 @@ public class ObjectBuilder {
                 output.put(fieldMapping.getName(), value);
             }
         }
+
         return output.toString();
     }
 }
