@@ -47,9 +47,14 @@ public class Request {
 
         JSONObject subObject = bodyJsonObject;
         for (int i = 0; i < orderedSelectors.length - 1; i++) {
-            subObject = subObject.getJSONObject(orderedSelectors[i]);
+            if (subObject.has(orderedSelectors[i])) {
+                subObject = subObject.getJSONObject(orderedSelectors[i]);
+            } else {
+                return null;
+            }
         }
 
-        return subObject.get(orderedSelectors[orderedSelectors.length - 1]);
+        return subObject.has(orderedSelectors[orderedSelectors.length - 1]) ?
+                subObject.get(orderedSelectors[orderedSelectors.length - 1]) : null;
     }
 }

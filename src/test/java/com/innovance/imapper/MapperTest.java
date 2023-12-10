@@ -226,6 +226,40 @@ public class MapperTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenSubfieldMappings_whenSomeMappingValuesNotFound_shouldMapOnlyMatchedValues() {
+        final String requestBody = """
+                {
+                    "field1" : "value1",
+                    "field2" : "value2",
+                    "customObj" : {
+                        "field1": "subObjectValue1",
+                        "field2": "subObjectValue2"
+                    }
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
+
+        final String expectedOutput = """
+                {
+                    "newField1" : "subObjectValue1"
+                }
+                """;
+
+        FieldMapping fieldMapping1 = createFieldMapping("newField1", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field1");
+        FieldMapping fieldMapping2 = createFieldMapping("newField2", ValueSourceType.REQUEST_BODY, "customObj" + SUBFIELD_SEPARATOR + "field3");
+        FieldMapping fieldMapping3 = createFieldMapping("newField3", ValueSourceType.REQUEST_BODY, "customObj2" + SUBFIELD_SEPARATOR + "field2");
+
+        ObjectBuilder ob = new ObjectBuilder();
+        ob.addFieldMappings(fieldMapping1);
+        ob.addFieldMappings(fieldMapping2);
+        ob.addFieldMappings(fieldMapping3);
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
     private FieldMapping createFieldMapping(String name, ValueSourceType valueSourceType, String valueFieldName) {
         return FieldMapping.builder()
                 .name(name)
