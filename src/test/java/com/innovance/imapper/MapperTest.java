@@ -331,7 +331,7 @@ public class MapperTest {
     void givenBasicMappingForObjectType_shouldMapSuccessfully() {
         FieldMapping fieldMapping = createFieldMapping("newCustomObj", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "customObj");
         ObjectBuilder ob = new ObjectBuilder(List.of(fieldMapping));
-        
+
         final String requestBody = """
                 {
                     "field1" : "value1",
@@ -356,6 +356,48 @@ public class MapperTest {
         String output = ob.buildJson(request);
 
         JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenBasicMappingsForLists_shouldMapExactListsSuccessfully() {
+        FieldMapping fieldMapping1 = createFieldMapping("list1", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "primitiveList");
+        FieldMapping fieldMapping2 = createFieldMapping("list2", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "objectList");
+        FieldMapping fieldMapping3 = createFieldMapping("list3", FieldType.BASIC, ValueSourceType.REQUEST_BODY, "listOfList");
+        ObjectBuilder ob = new ObjectBuilder(List.of(fieldMapping1, fieldMapping2, fieldMapping3));
+
+        final String requestBody = """
+                {
+                    "primitiveList" : [1,2,3],
+                    "objectList" : [
+                        { "field1": "li1Value1", "field2": "li1Value2" },
+                        { "field1": "li2Value1", "field2": "li2Value2" }
+                    ],
+                    "listOfList" : [
+                        [1,2,3],
+                        [4,5]
+                    ]
+                }
+                """;
+        Request request = new Request(null, null, requestBody);
+        
+        final String expectedOutput = """
+                {
+                    "list1" : [1,2,3],
+                    "list2" : [
+                        { "field1": "li1Value1", "field2": "li1Value2" },
+                        { "field1": "li2Value1", "field2": "li2Value2" }
+                    ],
+                    "list3" : [
+                        [1,2,3],
+                        [4,5]
+                    ]
+                }
+                """;
+
+        String output = ob.buildJson(request);
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+
     }
 
     private FieldMapping createFieldMapping(String name, FieldType fieldType, ValueSourceType valueSourceType, String valueFieldName) {
