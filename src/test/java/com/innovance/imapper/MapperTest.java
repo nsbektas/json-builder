@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static com.innovance.imapper.mapper.model.Request.SUBFIELD_SEPARATOR;
 
-public class MapperTest {
+class MapperTest {
 
     @Test
     void givenNoFieldMapping_shouldMapToEmptyString() throws JSONException {
@@ -379,7 +379,7 @@ public class MapperTest {
                 }
                 """;
         Request request = new Request(null, null, requestBody);
-        
+
         final String expectedOutput = """
                 {
                     "list1" : [1,2,3],
