@@ -6,6 +6,7 @@ import com.innovance.imapper.jsonbuilder.model.Model;
 import com.innovance.imapper.jsonbuilder.model.ModelData;
 import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -21,10 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class JsonBuilderTest {
 
+    private ModelData modelData;
+
+    @BeforeEach
+    void setup() {
+        this.modelData = createExampleModelData();
+    }
+
     @Test
     void givenNullModelType_shouldBuildNull() {
         Model model = Model.builder().type(ModelType.NULL).build();
-        ModelData modelData = new ModelData();
 
         String output = JsonBuilder.build(model, modelData);
 
@@ -34,7 +41,6 @@ class JsonBuilderTest {
     @Test
     void givenEmptyStringModelType_shouldBuildSuccessfully() {
         Model model = Model.builder().type(ModelType.EMPTY_STRING).build();
-        ModelData modelData = new ModelData();
 
         String output = JsonBuilder.build(model, modelData);
 
@@ -44,7 +50,6 @@ class JsonBuilderTest {
     @Test
     void givenEmptyObjectModelType_shouldBuildSuccessfully() {
         Model model = Model.builder().type(ModelType.EMPTY_OBJECT).build();
-        ModelData modelData = new ModelData();
 
         String output = JsonBuilder.build(model, modelData);
 
@@ -54,7 +59,6 @@ class JsonBuilderTest {
     @Test
     void givenEmptyListModelType_shouldBuildSuccessfully() {
         Model model = Model.builder().type(ModelType.EMPTY_LIST).build();
-        ModelData modelData = new ModelData();
 
         String output = JsonBuilder.build(model, modelData);
 
@@ -64,7 +68,6 @@ class JsonBuilderTest {
     @Test
     void givenObjectModelTypeWithNoFields_shouldBuildEmptyObject() {
         Model model = Model.builder().type(ModelType.OBJECT).fields(new ArrayList<>()).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -81,7 +84,6 @@ class JsonBuilderTest {
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -100,7 +102,6 @@ class JsonBuilderTest {
         Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableField2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -118,7 +119,6 @@ class JsonBuilderTest {
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -138,7 +138,6 @@ class JsonBuilderTest {
         Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("notAvailableQueryParam2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -156,7 +155,6 @@ class JsonBuilderTest {
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -176,7 +174,6 @@ class JsonBuilderTest {
         Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("notAvailablePathVariable2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -194,7 +191,6 @@ class JsonBuilderTest {
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -215,7 +211,6 @@ class JsonBuilderTest {
         Field field4 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableField").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -237,7 +232,6 @@ class JsonBuilderTest {
         Field field6 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1" + SUBFIELD_SEPARATOR + "field1").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4, field5, field6)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -260,7 +254,6 @@ class JsonBuilderTest {
 
         Field field = Field.builder().name("convertedObjectField").fieldType(FieldType.OBJECT).fieldModel(objectModel).build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -281,7 +274,6 @@ class JsonBuilderTest {
     void givenObjectModelTypeWithBasicFieldForObject_shouldBuildSuccessfully() {
         Field field = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1").build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
@@ -303,7 +295,6 @@ class JsonBuilderTest {
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField2").build();
         Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1").build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
-        ModelData modelData = createExampleModelData();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
