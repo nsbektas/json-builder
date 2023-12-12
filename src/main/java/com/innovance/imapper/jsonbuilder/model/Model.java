@@ -1,6 +1,6 @@
 package com.innovance.imapper.jsonbuilder.model;
 
-import com.innovance.imapper.mapper.model.entity.Field;
+import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
