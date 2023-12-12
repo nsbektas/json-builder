@@ -5,17 +5,23 @@ import com.innovance.imapper.jsonbuilder.model.Model;
 import com.innovance.imapper.jsonbuilder.model.ModelData;
 import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
-import com.innovance.imapper.jsonbuilder.model.enums.ValueLocation;
+import com.innovance.imapper.jsonbuilder.valuegetter.ValueGetter;
+import com.innovance.imapper.jsonbuilder.valuegetter.ValueGetterFactory;
 import lombok.experimental.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Objects;
+
 @UtilityClass
 public class JsonBuilder {
-    public static final String SUBFIELD_SEPARATOR = "->";
 
     public static String build(Model model, ModelData modelData) {
+        if (Objects.isNull(model)) {
+            return new JSONObject().toString();
+        }
+
         if (ModelType.NULL.equals(model.getType())) {
             return null;
         } else if (ModelType.EMPTY_STRING.equals(model.getType())) {
@@ -32,7 +38,7 @@ public class JsonBuilder {
     }
 
     private static JSONObject buildObjectModel(Model model, ModelData modelData) {
-        if (CollectionUtils.isEmpty(model.getFields())) {
+        if (Objects.isNull(model) || CollectionUtils.isEmpty(model.getFields())) {
             return new JSONObject();
         }
 
@@ -41,20 +47,15 @@ public class JsonBuilder {
             Object fieldValue = null;
 
             if (FieldType.BASIC.equals(field.getFieldType())) {
-                if (ValueLocation.PATH_VARIABLE.equals(field.getValueLocation())) {
-                    fieldValue = modelData.getPathVariables().get(field.getValueSelector());
-                } else if (ValueLocation.QUERY_PARAMETER.equals(field.getValueLocation())) {
-                    fieldValue = modelData.getQueryParameters().get(field.getValueSelector());
-                } else if (ValueLocation.REQUEST_BODY.equals(field.getValueLocation())) {
-                    fieldValue = modelData.getValueFromRequestBody(field.getValueSelector());
-                }
+                ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
+                fieldValue = valueGetter.getValue(modelData, field.getValueSelector());
             } else if (FieldType.OBJECT.equals(field.getFieldType())) {
-                //null check
                 fieldValue = buildObjectModel(field.getFieldModel(), modelData);
             }
-            
+
             output.put(field.getName(), fieldValue);
         }
+
         return output;
     }
 }

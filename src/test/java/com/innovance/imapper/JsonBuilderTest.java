@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.innovance.imapper.jsonbuilder.JsonBuilder.SUBFIELD_SEPARATOR;
 import static com.innovance.imapper.jsonbuilder.model.enums.FieldType.BASIC;
 import static com.innovance.imapper.jsonbuilder.model.enums.ValueLocation.*;
+import static com.innovance.imapper.jsonbuilder.valuegetter.impl.JsonValueGetter.SUBFIELD_SEPARATOR;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class JsonBuilderTest {
@@ -70,6 +70,17 @@ class JsonBuilderTest {
         Model model = Model.builder().type(ModelType.OBJECT).fields(new ArrayList<>()).build();
 
         String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenNullModel_shouldBuildEmptyObject() {
+        String output = JsonBuilder.build(null, modelData);
         String expectedOutput = """
                 {
                 }
@@ -267,6 +278,22 @@ class JsonBuilderTest {
                 }
                 """;
 
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenObjectModelTypeWithObjectFieldButNullModel_shouldBuildEmptyObject() {
+        Field field = Field.builder().name("convertedObjectField").fieldType(FieldType.OBJECT).fieldModel(null).build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedObjectField": {}
+                }
+                """;
+
+        System.out.println(output);
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
