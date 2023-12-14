@@ -197,6 +197,43 @@ class JsonBuilderTest {
     }
 
     @Test
+    void givenObjectModelTypeWithConstantFields_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
+        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(CONSTANT).valueSelector("constantKey2").build();
+
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": "valueForConstantKey1",
+                    "convertedField2": "valueForConstantKey2"
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenObjectModelTypeWithConstantFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
+        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
+        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
+        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
+
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": "valueForConstantKey1"
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+
+    @Test
     void givenObjectModelTypeWithBasicSubfieldMappings_shouldBuildSuccessfully() {
         Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
         Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
@@ -350,6 +387,12 @@ class JsonBuilderTest {
         queryParameters.put("queryParam2", "valueForQueryParam2");
         queryParameters.put("queryParam3", "valueForQueryParam3");
 
+        final Map<String, Object> constantsMap = new HashMap<>();
+        constantsMap.put("constantKey1", "valueForConstantKey1");
+        constantsMap.put("constantKey2", "valueForConstantKey2");
+        constantsMap.put("constantKey3", 1);
+        constantsMap.put("constantKey4", 2);
+
         final String requestBody = """
                 {
                     "field1": "valueForField1",
@@ -396,6 +439,7 @@ class JsonBuilderTest {
         ModelData modelData = new ModelData();
         modelData.setPathVariables(pathVariables);
         modelData.setQueryParameters(queryParameters);
+        modelData.setConstantsMap(constantsMap);
         modelData.setRequestBody(requestBody);
         modelData.setResponseBody(responseBody);
 
