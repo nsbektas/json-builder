@@ -5,5 +5,6 @@ public enum ValueLocation {
     QUERY_PARAMETER,
     CONSTANT,
     REQUEST_BODY,
-    RESPONSE_BODY
+    RESPONSE_BODY,
+    TARGET_LIST_ITEM
 }

@@ -15,6 +15,7 @@ public class ValueGetterFactory {
             case CONSTANT -> valueGetter = new ConstantValueGetter();
             case REQUEST_BODY -> valueGetter = new RequestBodyValueGetter();
             case RESPONSE_BODY -> valueGetter = new ResponseBodyValueGetter();
+            case TARGET_LIST_ITEM -> valueGetter = new TargetListItemValueGetter();
             default -> throw new IllegalArgumentException("Invalid Value Location:" + location);
         }
         return valueGetter;

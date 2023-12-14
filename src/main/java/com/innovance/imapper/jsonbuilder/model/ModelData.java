@@ -16,4 +16,6 @@ public class ModelData {
     private ConstantRepository constantRepository;
     private String requestBody;
     private String responseBody;
+
+    private Object targetListItem = null;
 }

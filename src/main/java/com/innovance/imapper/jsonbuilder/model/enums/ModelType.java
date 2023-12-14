@@ -6,5 +6,6 @@ public enum ModelType {
     EMPTY_OBJECT,
     EMPTY_LIST,
 
-    OBJECT
+    OBJECT,
+    BASIC //TODO JsonBuilder object's ModelType for nonjson value generation? Something is not right.
 }

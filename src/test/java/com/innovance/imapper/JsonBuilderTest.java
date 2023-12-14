@@ -8,6 +8,7 @@ import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
 import com.innovance.imapper.jsonbuilder.repository.ConstantRepository;
 import com.innovance.imapper.jsonbuilder.repository.impl.InMemoryConstantRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -378,6 +379,88 @@ class JsonBuilderTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenObjectModelTypeWithListField_whenNoListItemModel_shouldBuildSuccessfully() {
+        Model basicListItemModel = Model.builder().type(ModelType.BASIC).fields(
+                List.of(
+                        Field.builder().fieldType(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("").build()
+                )
+        ).build();
+        Field field1 = Field.builder().name("convertedField1").fieldType(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("basicListField1").fieldModel(basicListItemModel).build();
+        Field field2 = Field.builder().name("convertedField2").fieldType(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("basicListField2").fieldModel(basicListItemModel).build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": [1,2,3],
+                    "convertedField2": ["value1ForBasicListField2", "value2ForBasicListField2", "value3ForBasicListField2"]
+                }
+                """;
+        System.out.println(output);
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenBasicModelTypeWithNoFields_shouldThrowException() {
+        Model model = Model.builder().type(ModelType.BASIC)
+                .fields(null)
+                .build();
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> JsonBuilder.build(model, modelData));
+    }
+
+    @Test
+    void givenBasicModelTypeWithMoreThanOneField_shouldThrowException() {
+        Model model = Model.builder().type(ModelType.BASIC)
+                .fields(List.of(
+                        Field.builder().build(),
+                        Field.builder().build()
+                ))
+                .build();
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> JsonBuilder.build(model, modelData));
+    }
+
+    @Test
+    void givenBasicModelTypeWithOneField_shouldBuildSuccessfully() {
+        Model model = Model.builder().type(ModelType.BASIC)
+                .fields(List.of(
+                        Field.builder()
+                                .fieldType(BASIC)
+                                .valueLocation(REQUEST_BODY)
+                                .valueSelector("field1")
+                                .build()
+                ))
+                .build();
+        String output = JsonBuilder.build(model, modelData);
+
+        Assertions.assertEquals("valueForField1", output);
+    }
+
+    @Test
+    void givenObjectModelTypeWithListField_whenListItemModelIsObject_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("listField1").fieldType(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("field1").build();
+        Field field2 = Field.builder().name("listField2").fieldType(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("field2").build();
+        Model listObjectModel = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
+
+        Field field = Field.builder().name("convertedField").fieldType(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("objListField1").fieldModel(listObjectModel).build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField": [
+                        { "listField1": "valueForObjListField1.row1.field1", "listField2": "valueForObjListField1.row1.field2" },
+                        { "listField1": "valueForObjListField1.row2.field1", "listField2": "valueForObjListField1.row2.field2" },
+                        { "listField1": "valueForObjListField1.row3.field1", "listField2": "valueForObjListField1.row3.field2" },
+                    ]
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
     private ModelData createExampleModelData() {
         final Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("pathVariable1", "valueForPathVariable1");
@@ -418,6 +501,26 @@ class JsonBuilderTest {
                         { "field1": "valueForObjListField1.row1.field1", "field2": "valueForObjListField1.row1.field2" },
                         { "field1": "valueForObjListField1.row2.field1", "field2": "valueForObjListField1.row2.field2" },
                         { "field1": "valueForObjListField1.row3.field1", "field2": "valueForObjListField1.row3.field2" },
+                    ],
+                    "objField3": {
+                        "field1": "valueForObjField3.field1",
+                        "basicListField1": [1,2,3],
+                        "objListField1" : [
+                            { "field1": "valueForObjField3.ObjListField1.row1.field1", "field2": "valueForObjField3.ObjListField1.row1.field2" },
+                            { "field1": "valueForObjField3.ObjListField1.row2.field1", "field2": "valueForObjField3.ObjListField1.row2.field2" },
+                            { "field1": "valueForObjField3.ObjListField1.row3.field1", "field2": "valueForObjField3.ObjListField1.row3.field2" }
+                        ]
+                    },
+                    "listOfListField1": [[1,2,3],[3,4,5],[4,5,6]],
+                    "listOfListField2": [
+                        [
+                          { "field1": "valueForListOfListField2.row1.row1.field1", "field2": "valueForListOfListField2.row1.row1.field2" },
+                          { "field1": "valueForListOfListField2.row1.row2.field1", "field2": "valueForListOfListField2.row1.row2.field2" }
+                        ],
+                        [
+                          { "field1": "valueForListOfListField2.row2.row1.field1", "field2": "valueForListOfListField2.row2.row1.field2" },
+                          { "field1": "valueForListOfListField2.row2.row2.field1", "field2": "valueForListOfListField2.row2.row2.field2" }
+                        ],
                     ]
                 }
                 """;
