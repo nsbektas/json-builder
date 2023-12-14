@@ -6,6 +6,8 @@ import com.innovance.imapper.jsonbuilder.model.Model;
 import com.innovance.imapper.jsonbuilder.model.ModelData;
 import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
+import com.innovance.imapper.jsonbuilder.repository.ConstantRepository;
+import com.innovance.imapper.jsonbuilder.repository.impl.InMemoryConstantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -18,7 +20,6 @@ import java.util.Map;
 import static com.innovance.imapper.jsonbuilder.model.enums.FieldType.BASIC;
 import static com.innovance.imapper.jsonbuilder.model.enums.ValueLocation.*;
 import static com.innovance.imapper.jsonbuilder.valuegetter.impl.JsonValueGetter.SUBFIELD_SEPARATOR;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class JsonBuilderTest {
 
@@ -29,41 +30,6 @@ class JsonBuilderTest {
         this.modelData = createExampleModelData();
     }
 
-    @Test
-    void givenNullModelType_shouldBuildNull() {
-        Model model = Model.builder().type(ModelType.NULL).build();
-
-        String output = JsonBuilder.build(model, modelData);
-
-        assertNull(output);
-    }
-
-    @Test
-    void givenEmptyStringModelType_shouldBuildSuccessfully() {
-        Model model = Model.builder().type(ModelType.EMPTY_STRING).build();
-
-        String output = JsonBuilder.build(model, modelData);
-
-        JSONAssert.assertEquals("", output, true);
-    }
-
-    @Test
-    void givenEmptyObjectModelType_shouldBuildSuccessfully() {
-        Model model = Model.builder().type(ModelType.EMPTY_OBJECT).build();
-
-        String output = JsonBuilder.build(model, modelData);
-
-        JSONAssert.assertEquals("{}", output, true);
-    }
-
-    @Test
-    void givenEmptyListModelType_shouldBuildSuccessfully() {
-        Model model = Model.builder().type(ModelType.EMPTY_LIST).build();
-
-        String output = JsonBuilder.build(model, modelData);
-
-        JSONAssert.assertEquals("[]", output, true);
-    }
 
     @Test
     void givenObjectModelTypeWithNoFields_shouldBuildEmptyObject() {
@@ -91,8 +57,8 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicFields_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
 
@@ -108,9 +74,9 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableField1").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableField2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableField1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableField2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
 
@@ -126,8 +92,8 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithQueryParamFields_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
 
@@ -144,9 +110,9 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithQueryParamFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("notAvailableQueryParam1").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("notAvailableQueryParam2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("queryParam1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("notAvailableQueryParam1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(QUERY_PARAMETER).valueSelector("notAvailableQueryParam2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
 
@@ -162,8 +128,8 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithPathVariableFields_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
 
@@ -180,9 +146,9 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithPathVariableFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("notAvailablePathVariable1").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(PATH_VARIABLE).valueSelector("notAvailablePathVariable2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(PATH_VARIABLE).valueSelector("pathVariable1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(PATH_VARIABLE).valueSelector("notAvailablePathVariable1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(PATH_VARIABLE).valueSelector("notAvailablePathVariable2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
 
@@ -197,9 +163,46 @@ class JsonBuilderTest {
     }
 
     @Test
+    void givenObjectModelTypeWithConstantFields_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey2").build();
+
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": "valueForConstantKey1",
+                    "convertedField2": "valueForConstantKey2"
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenObjectModelTypeWithConstantFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
+
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": "valueForConstantKey1"
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+
+    @Test
     void givenObjectModelTypeWithBasicSubfieldMappings_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
 
@@ -216,10 +219,10 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicSubfieldMappings_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "notAvailableField").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableObjField" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field4 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableField").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "notAvailableField").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableObjField" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field4 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableObjField" + SUBFIELD_SEPARATOR + "notAvailableField").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4)).build();
 
@@ -235,12 +238,12 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicSubfieldMappings_whenSomeMappingNotCorrectType_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField1").build();
-        Field field4 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField2").build();
-        Field field5 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1").build();
-        Field field6 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField1").build();
+        Field field4 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField2").build();
+        Field field5 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1").build();
+        Field field6 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1" + SUBFIELD_SEPARATOR + "field1").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4, field5, field6)).build();
 
@@ -256,14 +259,12 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithObjectFieldMapping_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
-        Field field4 = Field.builder().name("convertedField4").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field1").build();
+        Field field4 = Field.builder().name("convertedField4").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1" + SUBFIELD_SEPARATOR + "field2").build();
 
-        Model objectModel = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4)).build();
-
-        Field field = Field.builder().name("convertedObjectField").fieldType(FieldType.OBJECT).fieldModel(objectModel).build();
+        Field field = Field.builder().name("convertedObjectField").type(FieldType.OBJECT).subfields(List.of(field1, field2, field3, field4)).build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
 
         String output = JsonBuilder.build(model, modelData);
@@ -282,8 +283,8 @@ class JsonBuilderTest {
     }
 
     @Test
-    void givenObjectModelTypeWithObjectFieldButNullModel_shouldBuildEmptyObject() {
-        Field field = Field.builder().name("convertedObjectField").fieldType(FieldType.OBJECT).fieldModel(null).build();
+    void givenObjectModelTypeWithObjectFieldAndNoSubfields_shouldBuildEmptyObject() {
+        Field field = Field.builder().name("convertedObjectField").type(FieldType.OBJECT).subfields(null).build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
 
         String output = JsonBuilder.build(model, modelData);
@@ -299,7 +300,7 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicFieldForObject_shouldBuildSuccessfully() {
-        Field field = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1").build();
+        Field field = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objField1").build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
 
         String output = JsonBuilder.build(model, modelData);
@@ -318,9 +319,9 @@ class JsonBuilderTest {
 
     @Test
     void givenObjectModelTypeWithBasicFieldForList_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField1").build();
-        Field field2 = Field.builder().name("convertedField2").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField2").build();
-        Field field3 = Field.builder().name("convertedField3").fieldType(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1").build();
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("basicListField2").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("objListField1").build();
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
 
         String output = JsonBuilder.build(model, modelData);
@@ -339,6 +340,49 @@ class JsonBuilderTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenObjectModelTypeWithListField_whenNoListItemModel_shouldBuildSuccessfully() {
+        Field basicListItemField = Field.builder().type(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("").build();
+
+        Field field1 = Field.builder().name("convertedField1").type(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("basicListField1").listItem(basicListItemField).build();
+        Field field2 = Field.builder().name("convertedField2").type(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("basicListField2").listItem(basicListItemField).build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": [1,2,3],
+                    "convertedField2": ["value1ForBasicListField2", "value2ForBasicListField2", "value3ForBasicListField2"]
+                }
+                """;
+        System.out.println(output);
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenObjectModelTypeWithListField_whenListItemModelIsObject_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("listField1").type(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("field1").build();
+        Field field2 = Field.builder().name("listField2").type(BASIC).valueLocation(TARGET_LIST_ITEM).valueSelector("field2").build();
+
+        Field field = Field.builder().name("convertedField").type(FieldType.LIST).valueLocation(REQUEST_BODY).valueSelector("objListField1")
+                .listItem(Field.builder().type(FieldType.OBJECT).subfields(List.of(field1, field2)).build())
+                .build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField": [
+                        { "listField1": "valueForObjListField1.row1.field1", "listField2": "valueForObjListField1.row1.field2" },
+                        { "listField1": "valueForObjListField1.row2.field1", "listField2": "valueForObjListField1.row2.field2" },
+                        { "listField1": "valueForObjListField1.row3.field1", "listField2": "valueForObjListField1.row3.field2" },
+                    ]
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
     private ModelData createExampleModelData() {
         final Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("pathVariable1", "valueForPathVariable1");
@@ -349,6 +393,14 @@ class JsonBuilderTest {
         queryParameters.put("queryParam1", "valueForQueryParam1");
         queryParameters.put("queryParam2", "valueForQueryParam2");
         queryParameters.put("queryParam3", "valueForQueryParam3");
+
+        final Map<String, Object> constantsMap = new HashMap<>();
+        constantsMap.put("constantKey1", "valueForConstantKey1");
+        constantsMap.put("constantKey2", "valueForConstantKey2");
+        constantsMap.put("constantKey3", 1);
+        constantsMap.put("constantKey4", 2);
+
+        final ConstantRepository constantRepository = new InMemoryConstantRepository(constantsMap);
 
         final String requestBody = """
                 {
@@ -371,6 +423,26 @@ class JsonBuilderTest {
                         { "field1": "valueForObjListField1.row1.field1", "field2": "valueForObjListField1.row1.field2" },
                         { "field1": "valueForObjListField1.row2.field1", "field2": "valueForObjListField1.row2.field2" },
                         { "field1": "valueForObjListField1.row3.field1", "field2": "valueForObjListField1.row3.field2" },
+                    ],
+                    "objField3": {
+                        "field1": "valueForObjField3.field1",
+                        "basicListField1": [1,2,3],
+                        "objListField1" : [
+                            { "field1": "valueForObjField3.ObjListField1.row1.field1", "field2": "valueForObjField3.ObjListField1.row1.field2" },
+                            { "field1": "valueForObjField3.ObjListField1.row2.field1", "field2": "valueForObjField3.ObjListField1.row2.field2" },
+                            { "field1": "valueForObjField3.ObjListField1.row3.field1", "field2": "valueForObjField3.ObjListField1.row3.field2" }
+                        ]
+                    },
+                    "listOfListField1": [[1,2,3],[3,4,5],[4,5,6]],
+                    "listOfListField2": [
+                        [
+                          { "field1": "valueForListOfListField2.row1.row1.field1", "field2": "valueForListOfListField2.row1.row1.field2" },
+                          { "field1": "valueForListOfListField2.row1.row2.field1", "field2": "valueForListOfListField2.row1.row2.field2" }
+                        ],
+                        [
+                          { "field1": "valueForListOfListField2.row2.row1.field1", "field2": "valueForListOfListField2.row2.row1.field2" },
+                          { "field1": "valueForListOfListField2.row2.row2.field1", "field2": "valueForListOfListField2.row2.row2.field2" }
+                        ],
                     ]
                 }
                 """;
@@ -396,6 +468,7 @@ class JsonBuilderTest {
         ModelData modelData = new ModelData();
         modelData.setPathVariables(pathVariables);
         modelData.setQueryParameters(queryParameters);
+        modelData.setConstantRepository(constantRepository);
         modelData.setRequestBody(requestBody);
         modelData.setResponseBody(responseBody);
 

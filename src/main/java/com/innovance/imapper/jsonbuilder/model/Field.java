@@ -4,6 +4,8 @@ import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ValueLocation;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -11,14 +13,14 @@ import lombok.*;
 @AllArgsConstructor
 public class Field {
 
-    private long id;
     private String name;
-    private FieldType fieldType;
-
+    private FieldType type;
     private ValueLocation valueLocation;
     private String valueSelector;
 
-    private Model parentModel;
-    private Model fieldModel;
+    // Subfields of Field for FieldType.OBJECT
+    private List<Field> subfields;
 
+    // List Item Field of Field for FieldType.LIST
+    private Field listItem; // For List Types
 }
