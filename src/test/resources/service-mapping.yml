@@ -1,0 +1,23 @@
+serviceMappingList:
+  - serviceName: service1
+    endpoint: /api/v1/Authorization/SessionContexts/InitiateApplicationClientSession
+    requestModel:
+      type: OBJECT
+      fields:
+        - name: SEARCHTITLE
+          type: BASIC
+          valueLocation: PATH_VARIABLE
+          valueSelector: IdentificationNumber
+    responseModel:
+      type: OBJECT
+      fields:
+        - name: Value
+          type: OBJECT
+          subfields:
+            - name: IndividualCustomer
+              type: OBJECT
+              subfields:
+                - name: FirstName
+                  type: BASIC
+                  valueLocation: RESPONSE_BODY
+                  valueSelector: NAMEA

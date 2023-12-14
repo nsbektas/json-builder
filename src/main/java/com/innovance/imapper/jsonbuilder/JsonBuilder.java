@@ -12,45 +12,32 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 @UtilityClass
 public class JsonBuilder {
 
     public static String build(Model model, ModelData modelData) {
-        Object output = buildModel(model, modelData);
-        return output != null ? output.toString() : null;
-    }
-
-    private static Object buildModel(Model model, ModelData modelData) {
         if (Objects.isNull(model)) {
-            return new JSONObject();
+            return new JSONObject().toString();
         }
 
-        if (ModelType.NULL.equals(model.getType())) {
-            return null;
-        } else if (ModelType.EMPTY_STRING.equals(model.getType())) {
-            return "";
-        } else if (ModelType.EMPTY_OBJECT.equals(model.getType())) {
-            return new JSONObject();
-        } else if (ModelType.EMPTY_LIST.equals(model.getType())) {
-            return new JSONArray();
-        } else if (ModelType.OBJECT.equals(model.getType())) {
-            return buildObjectModel(model, modelData);
-        } else if (ModelType.BASIC.equals(model.getType())) {
-            return buildBasicValue(model, modelData);
+
+        if (ModelType.OBJECT.equals(model.getType())) {
+            return buildObjectModel(model.getFields(), modelData).toString();
         } else {
             throw new IllegalArgumentException("Not Implemented Yet");
         }
     }
 
-    private static JSONObject buildObjectModel(Model model, ModelData modelData) {
-        if (Objects.isNull(model) || CollectionUtils.isEmpty(model.getFields())) {
+    private static JSONObject buildObjectModel(List<Field> fields, ModelData modelData) {
+        if (CollectionUtils.isEmpty(fields)) {
             return new JSONObject();
         }
 
         JSONObject output = new JSONObject();
-        for (Field field : model.getFields()) {
+        for (Field field : fields) {
             Object fieldValue = buildFieldValue(field, modelData);
             output.put(field.getName(), fieldValue);
         }
@@ -58,24 +45,8 @@ public class JsonBuilder {
         return output;
     }
 
-    private static Object buildFieldValue(Field field, ModelData modelData) {
-        Object fieldValue = null;
-        if (FieldType.BASIC.equals(field.getFieldType())) {
-            ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
-            fieldValue = valueGetter.getValue(modelData, field.getValueSelector());
-        } else if (FieldType.OBJECT.equals(field.getFieldType())) {
-            fieldValue = buildObjectModel(field.getFieldModel(), modelData);
-        } else if (FieldType.LIST.equals(field.getFieldType())) {
-            ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
-            JSONArray targetList = (JSONArray) valueGetter.getValue(modelData, field.getValueSelector());
-            fieldValue = buildListModel(field.getFieldModel(), modelData, targetList);
-        }
-
-        return fieldValue;
-    }
-
-    private static JSONArray buildListModel(Model model, ModelData modelData, JSONArray targetList) {
-        if (Objects.isNull(model) || CollectionUtils.isEmpty(model.getFields())) {
+    private static JSONArray buildListModel(Field listItemField, ModelData modelData, JSONArray targetList) {
+        if (Objects.isNull(listItemField)) {
             return new JSONArray();
         }
 
@@ -83,19 +54,27 @@ public class JsonBuilder {
         for (int i = 0; i < targetList.length(); i++) {
             Object previousTargetListItem = modelData.getTargetListItem();
             modelData.setTargetListItem(targetList.get(i));
-            Object listItem = buildModel(model, modelData);
+            Object listItemFieldValue = buildFieldValue(listItemField, modelData);
             modelData.setTargetListItem(previousTargetListItem);
-            output.put(listItem);
+            output.put(listItemFieldValue);
         }
 
         return output;
     }
 
-    private static Object buildBasicValue(Model model, ModelData modelData) {
-        int fieldCount = CollectionUtils.isEmpty(model.getFields()) ? 0 : model.getFields().size();
-        if (fieldCount != 1) {
-            throw new IllegalArgumentException("Model with type ModelType.BASIC must have exactly 1 field.");
+    private static Object buildFieldValue(Field field, ModelData modelData) {
+        Object fieldValue = null;
+        if (FieldType.BASIC.equals(field.getType())) {
+            ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
+            fieldValue = valueGetter.getValue(modelData, field.getValueSelector());
+        } else if (FieldType.OBJECT.equals(field.getType())) {
+            fieldValue = buildObjectModel(field.getSubfields(), modelData);
+        } else if (FieldType.LIST.equals(field.getType())) {
+            ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
+            JSONArray targetList = (JSONArray) valueGetter.getValue(modelData, field.getValueSelector()); //TODO add type check
+            fieldValue = buildListModel(field.getListItem(), modelData, targetList);
         }
-        return buildFieldValue(model.getFields().get(0), modelData);
+
+        return fieldValue;
     }
 }
