@@ -7,6 +7,6 @@ public class ConstantValueGetter extends ValueGetter {
 
     @Override
     public Object getValue(ModelData modelData, String selector) {
-        return modelData.getConstantsMap().get(selector);
+        return modelData.getConstantRepository().findByKey(selector);
     }
 }

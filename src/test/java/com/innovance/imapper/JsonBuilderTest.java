@@ -6,6 +6,8 @@ import com.innovance.imapper.jsonbuilder.model.Model;
 import com.innovance.imapper.jsonbuilder.model.ModelData;
 import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
+import com.innovance.imapper.jsonbuilder.repository.ConstantRepository;
+import com.innovance.imapper.jsonbuilder.repository.impl.InMemoryConstantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -393,6 +395,8 @@ class JsonBuilderTest {
         constantsMap.put("constantKey3", 1);
         constantsMap.put("constantKey4", 2);
 
+        final ConstantRepository constantRepository = new InMemoryConstantRepository(constantsMap);
+
         final String requestBody = """
                 {
                     "field1": "valueForField1",
@@ -439,7 +443,7 @@ class JsonBuilderTest {
         ModelData modelData = new ModelData();
         modelData.setPathVariables(pathVariables);
         modelData.setQueryParameters(queryParameters);
-        modelData.setConstantsMap(constantsMap);
+        modelData.setConstantRepository(constantRepository);
         modelData.setRequestBody(requestBody);
         modelData.setResponseBody(responseBody);
 
