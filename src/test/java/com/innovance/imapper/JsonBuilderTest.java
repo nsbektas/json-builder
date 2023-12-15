@@ -198,6 +198,24 @@ class JsonBuilderTest {
         JSONAssert.assertEquals(expectedOutput, output, true);
     }
 
+    @Test
+    void givenObjectModelTypeWithConstantFields_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(CONSTANT).valueSelector("constantValue1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(CONSTANT).valueSelector("constantValue2").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(CONSTANT).valueSelector("").build();
+
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                    "convertedField1": "constantValue1",
+                    "convertedField2": "constantValue2",
+                    "convertedField3": ""
+                }
+                """;
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
 
     @Test
     void givenObjectModelTypeWithBasicSubfieldMappings_shouldBuildSuccessfully() {

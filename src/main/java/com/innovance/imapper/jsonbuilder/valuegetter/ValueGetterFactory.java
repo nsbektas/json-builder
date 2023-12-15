@@ -12,6 +12,7 @@ public class ValueGetterFactory {
         switch (location) {
             case PATH_VARIABLE -> valueGetter = new PathVariableValueGetter();
             case QUERY_PARAMETER -> valueGetter = new QueryParameterValueGetter();
+            case CONSTANT -> valueGetter = new ConstantValueGetter();
             case PARAMETER -> valueGetter = new ParameterValueGetter();
             case REQUEST_BODY -> valueGetter = new RequestBodyValueGetter();
             case RESPONSE_BODY -> valueGetter = new ResponseBodyValueGetter();

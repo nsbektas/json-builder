@@ -23,7 +23,6 @@ public class JsonBuilder {
             return new JSONObject().toString();
         }
 
-
         if (ModelType.OBJECT.equals(model.getType())) {
             return buildObjectModel(model.getFields(), modelData).toString();
         } else {
