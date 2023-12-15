@@ -6,8 +6,8 @@ import com.innovance.imapper.jsonbuilder.model.Model;
 import com.innovance.imapper.jsonbuilder.model.ModelData;
 import com.innovance.imapper.jsonbuilder.model.enums.FieldType;
 import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
-import com.innovance.imapper.jsonbuilder.repository.ConstantRepository;
-import com.innovance.imapper.jsonbuilder.repository.impl.InMemoryConstantRepository;
+import com.innovance.imapper.jsonbuilder.repository.ParameterRepository;
+import com.innovance.imapper.jsonbuilder.repository.impl.InMemoryParameterRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -163,17 +163,17 @@ class JsonBuilderTest {
     }
 
     @Test
-    void givenObjectModelTypeWithConstantFields_shouldBuildSuccessfully() {
-        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
-        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey2").build();
+    void givenObjectModelTypeWithParameterFields_shouldBuildSuccessfully() {
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(PARAMETER).valueSelector("parameterKey1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(PARAMETER).valueSelector("parameterKey2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2)).build();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
                 {
-                    "convertedField1": "valueForConstantKey1",
-                    "convertedField2": "valueForConstantKey2"
+                    "convertedField1": "valueForParameterKey1",
+                    "convertedField2": "valueForParameterKey2"
                 }
                 """;
 
@@ -181,17 +181,17 @@ class JsonBuilderTest {
     }
 
     @Test
-    void givenObjectModelTypeWithConstantFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
-        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(CONSTANT).valueSelector("constantKey1").build();
-        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
-        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(CONSTANT).valueSelector("notAvailableConstantKey1").build();
+    void givenObjectModelTypeWithParameterFields_whenSomeMappingValuesNotFound_shouldBuildOnlyMatchedValues() {
+        Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(PARAMETER).valueSelector("parameterKey1").build();
+        Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(PARAMETER).valueSelector("notAvailableParameterKey1").build();
+        Field field3 = Field.builder().name("convertedField3").type(BASIC).valueLocation(PARAMETER).valueSelector("notAvailableParameterKey2").build();
 
         Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3)).build();
 
         String output = JsonBuilder.build(model, modelData);
         String expectedOutput = """
                 {
-                    "convertedField1": "valueForConstantKey1"
+                    "convertedField1": "valueForParameterKey1"
                 }
                 """;
 
@@ -394,13 +394,13 @@ class JsonBuilderTest {
         queryParameters.put("queryParam2", "valueForQueryParam2");
         queryParameters.put("queryParam3", "valueForQueryParam3");
 
-        final Map<String, Object> constantsMap = new HashMap<>();
-        constantsMap.put("constantKey1", "valueForConstantKey1");
-        constantsMap.put("constantKey2", "valueForConstantKey2");
-        constantsMap.put("constantKey3", 1);
-        constantsMap.put("constantKey4", 2);
+        final Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("parameterKey1", "valueForParameterKey1");
+        parameterMap.put("parameterKey2", "valueForParameterKey2");
+        parameterMap.put("parameterKey3", 1);
+        parameterMap.put("parameterKey4", 2);
 
-        final ConstantRepository constantRepository = new InMemoryConstantRepository(constantsMap);
+        final ParameterRepository parameterRepository = new InMemoryParameterRepository(parameterMap);
 
         final String requestBody = """
                 {
@@ -468,7 +468,7 @@ class JsonBuilderTest {
         ModelData modelData = new ModelData();
         modelData.setPathVariables(pathVariables);
         modelData.setQueryParameters(queryParameters);
-        modelData.setConstantRepository(constantRepository);
+        modelData.setParameterRepository(parameterRepository);
         modelData.setRequestBody(requestBody);
         modelData.setResponseBody(responseBody);
 

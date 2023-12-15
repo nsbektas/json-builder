@@ -1,6 +1,6 @@
 package com.innovance.imapper.jsonbuilder.model;
 
-import com.innovance.imapper.jsonbuilder.repository.ConstantRepository;
+import com.innovance.imapper.jsonbuilder.repository.ParameterRepository;
 import lombok.*;
 
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
 public class ModelData {
     private Map<String, String> pathVariables;
     private Map<String, String> queryParameters;
-    private ConstantRepository constantRepository;
+    private ParameterRepository parameterRepository;
     private String requestBody;
     private String responseBody;
 

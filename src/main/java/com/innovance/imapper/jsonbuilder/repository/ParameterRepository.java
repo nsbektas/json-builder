@@ -1,6 +1,6 @@
 package com.innovance.imapper.jsonbuilder.repository;
 
-public interface ConstantRepository {
+public interface ParameterRepository {
 
     Object findByKey(String key);
 }
