@@ -56,6 +56,61 @@ class JsonBuilderTest {
     }
 
     @Test
+    void givenNullModelData_shouldBuildEmptyObject() {
+        Field field1 = Field.builder().type(BASIC).name("field1").valueLocation(PATH_VARIABLE).valueSelector("field1").build();
+        Field field2 = Field.builder().type(BASIC).name("field2").valueLocation(QUERY_PARAMETER).valueSelector("field2").build();
+        Field field3 = Field.builder().type(BASIC).name("field3").valueLocation(PARAMETER).valueSelector("field3").build();
+        Field field4 = Field.builder().type(BASIC).name("field4").valueLocation(REQUEST_BODY).valueSelector("field4").build();
+        Field field5 = Field.builder().type(BASIC).name("field5").valueLocation(RESPONSE_BODY).valueSelector("field5").build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4, field5)).build();
+
+        String output = JsonBuilder.build(model, null);
+        String expectedOutput = """
+                {
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenModelDataWithNullFields_shouldBuildEmptyObject() {
+        Field field1 = Field.builder().type(BASIC).name("field1").valueLocation(PATH_VARIABLE).valueSelector("field1").build();
+        Field field2 = Field.builder().type(BASIC).name("field2").valueLocation(QUERY_PARAMETER).valueSelector("field2").build();
+        Field field3 = Field.builder().type(BASIC).name("field3").valueLocation(PARAMETER).valueSelector("field3").build();
+        Field field4 = Field.builder().type(BASIC).name("field4").valueLocation(REQUEST_BODY).valueSelector("field4").build();
+        Field field5 = Field.builder().type(BASIC).name("field5").valueLocation(RESPONSE_BODY).valueSelector("field5").build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4, field5)).build();
+
+        String output = JsonBuilder.build(model, new ModelData());
+        String expectedOutput = """
+                {
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
+    void givenNullSelectorValues_shouldBuildEmptyObject() {
+        Field field1 = Field.builder().type(BASIC).name("field1NullSelector").valueLocation(PATH_VARIABLE).valueSelector(null).build();
+        Field field2 = Field.builder().type(BASIC).name("field2NullSelector").valueLocation(QUERY_PARAMETER).valueSelector(null).build();
+        Field field3 = Field.builder().type(BASIC).name("field3NullSelector").valueLocation(PARAMETER).valueSelector(null).build();
+        Field field4 = Field.builder().type(BASIC).name("field4NullSelector").valueLocation(REQUEST_BODY).valueSelector(null).build();
+        Field field5 = Field.builder().type(BASIC).name("field5NullSelector").valueLocation(RESPONSE_BODY).valueSelector(null).build();
+        Model model = Model.builder().type(ModelType.OBJECT).fields(List.of(field1, field2, field3, field4, field5)).build();
+        ModelData modelData = createExampleModelData();
+
+        String output = JsonBuilder.build(model, modelData);
+        String expectedOutput = """
+                {
+                }
+                """;
+
+        JSONAssert.assertEquals(expectedOutput, output, true);
+    }
+
+    @Test
     void givenObjectModelTypeWithBasicFields_shouldBuildSuccessfully() {
         Field field1 = Field.builder().name("convertedField1").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field1").build();
         Field field2 = Field.builder().name("convertedField2").type(BASIC).valueLocation(REQUEST_BODY).valueSelector("field2").build();

@@ -9,12 +9,12 @@ public class TargetListItemValueGetter extends JsonValueGetter {
     public Object getValue(ModelData modelData, String selector) {
         if (StringUtils.isEmpty(selector)) {
             return modelData.getTargetListItem();
+        }
+
+        if (modelData == null || modelData.getTargetListItem() == null) {
+            return null;
         } else {
-            if (modelData.getTargetListItem() == null) {
-                return null;
-            } else {
-                return getValueFromJson(modelData.getTargetListItem().toString(), selector);
-            }
+            return getValueFromJson(modelData.getTargetListItem().toString(), selector);
         }
     }
 }

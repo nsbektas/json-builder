@@ -8,6 +8,7 @@ import com.innovance.imapper.jsonbuilder.model.enums.ModelType;
 import com.innovance.imapper.jsonbuilder.valuegetter.ValueGetter;
 import com.innovance.imapper.jsonbuilder.valuegetter.ValueGetterFactory;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.util.CollectionUtils;
@@ -37,28 +38,42 @@ public class JsonBuilder {
 
         JSONObject output = new JSONObject();
         for (Field field : fields) {
-            Object fieldValue = buildFieldValue(field, modelData);
-            output.put(field.getName(), fieldValue);
+            if (!StringUtils.isBlank(field.getName())) {
+                Object fieldValue = buildFieldValue(field, modelData);
+                output.put(field.getName(), fieldValue);
+            }
         }
 
         return output;
     }
 
-    private static JSONArray buildListModel(Field listItemField, ModelData modelData, JSONArray targetList) {
-        if (Objects.isNull(listItemField)) {
+    private static JSONArray buildListModel(Field field, ModelData modelData) {
+        if (Objects.isNull(field.getListItem()) || Objects.isNull(modelData)) {
             return new JSONArray();
         }
 
         JSONArray output = new JSONArray();
+        JSONArray targetList = findTargetList(field, modelData);
         for (int i = 0; i < targetList.length(); i++) {
             Object previousTargetListItem = modelData.getTargetListItem();
             modelData.setTargetListItem(targetList.get(i));
-            Object listItemFieldValue = buildFieldValue(listItemField, modelData);
+            Object listItemFieldValue = buildFieldValue(field.getListItem(), modelData);
             modelData.setTargetListItem(previousTargetListItem);
             output.put(listItemFieldValue);
         }
 
         return output;
+    }
+
+    private JSONArray findTargetList(Field field, ModelData modelData) {
+        ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
+        Object maybeTargetList = valueGetter.getValue(modelData, field.getValueSelector());
+
+        if (maybeTargetList instanceof JSONArray targetList) {
+            return targetList;
+        } else {
+            return new JSONArray();
+        }
     }
 
     private static Object buildFieldValue(Field field, ModelData modelData) {
@@ -69,9 +84,7 @@ public class JsonBuilder {
         } else if (FieldType.OBJECT.equals(field.getType())) {
             fieldValue = buildObjectModel(field.getSubfields(), modelData);
         } else if (FieldType.LIST.equals(field.getType())) {
-            ValueGetter valueGetter = ValueGetterFactory.getValueGetter(field.getValueLocation());
-            JSONArray targetList = (JSONArray) valueGetter.getValue(modelData, field.getValueSelector()); //TODO add type check
-            fieldValue = buildListModel(field.getListItem(), modelData, targetList);
+            fieldValue = buildListModel(field, modelData);
         }
 
         return fieldValue;
