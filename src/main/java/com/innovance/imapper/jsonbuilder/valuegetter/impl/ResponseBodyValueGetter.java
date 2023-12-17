@@ -6,6 +6,10 @@ public class ResponseBodyValueGetter extends JsonValueGetter {
 
     @Override
     public Object getValue(ModelData modelData, String selector) {
+        if (modelData == null || modelData.getResponseBody() == null) {
+            return null;
+        }
+
         return getValueFromJson(modelData.getResponseBody(), selector);
     }
 }

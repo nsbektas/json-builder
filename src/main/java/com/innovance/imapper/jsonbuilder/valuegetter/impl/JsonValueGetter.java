@@ -1,16 +1,26 @@
 package com.innovance.imapper.jsonbuilder.valuegetter.impl;
 
 import com.innovance.imapper.jsonbuilder.valuegetter.ValueGetter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
+@Slf4j
 public abstract class JsonValueGetter extends ValueGetter {
 
-    //TODO Maybe Move Into Some Other Constants Class
     public static final String SUBFIELD_SEPARATOR = "->";
 
     public Object getValueFromJson(String json, String selector) {
-        String[] orderedSelectors = selector.split(SUBFIELD_SEPARATOR);
-        return getValueOrNull(new JSONObject(json), orderedSelectors);
+        if (StringUtils.isBlank(selector)) {
+            return null;
+        }
+        try {
+            String[] orderedSelectors = selector.split(SUBFIELD_SEPARATOR);
+            return getValueOrNull(new JSONObject(json), orderedSelectors);
+        } catch (Exception e) {
+            log.warn("Exception while getValueFromJson for json:{}, selector:{}", json, selector, e);
+            return null;
+        }
     }
 
     private Object getValueOrNull(JSONObject obj, String[] selectors) {
